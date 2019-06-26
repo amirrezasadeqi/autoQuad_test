@@ -17,17 +17,17 @@ float p_roll=0.001, p_pitch=0.001, p_throttle=0.001;
 // refCallback
 void refCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-    x_r = msg->position.x;
-    y_r = msg->position.y;
-    z_r = msg->position.z;
+    x_r = msg->pose.position.x;
+    y_r = msg->pose.position.y;
+    z_r = msg->pose.position.z;
 }
 
 // poseCallback
 void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-    x_c = msg->position.x;
-    y_c = msg->position.y;
-    z_c = msg->position.z;
+    x_c = msg->pose.position.x;
+    y_c = msg->pose.position.y;
+    z_c = msg->pose.position.z;
 }
 
 // now the main function 
@@ -58,7 +58,10 @@ int main(int argc, char **argv)
         throttle = p_throttle * (y_r - y_c);
 
         // now assign these values to the message content to publish the message.
-        command.auto_com = [roll, pitch, throttle];
+        //command.auto_com = {roll, pitch, throttle};
+	command.auto_com.x = roll;
+	command.auto_com.y = pitch;
+	command.auto_com.z = throttle;
         //publish the message
         auto_com_pub.publish(command);
         ros::spinOnce(); // this is actually subscribing the refrence and currect positions via callback functions
