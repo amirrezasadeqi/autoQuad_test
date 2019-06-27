@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- including the r200 launch file for getting 
+  the video from r200 camera -->
+  <include file="$(find realsense_camera)/launch/r200_nodelet_default.launch" />
+   <!-- including the aruco marker finder for 
+   detecting single marker -->
+   <include file="$(find marker_finder)/launch/aruco_marker_finder_r200.launch" />
+   <!-- launching the navigation node for autonomous guidance -->
+   <node pkg="guid" type="nav_node" name="auto_guider" />
+   <!-- launching the i2c_node for sending the auto commands to mid-ware board -->
+   <node pkg="i2c_gate" type="i2c_node.py" name="i2c_bus" />
+
+</launch>
