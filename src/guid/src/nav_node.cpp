@@ -10,7 +10,9 @@
 unsigned short int roll, pitch, throttle;
 double x_r, y_r, z_r, x_c, y_c, z_c;
 // p controller coefficients
-float p_roll=0.001, p_pitch=0.001, p_throttle=0.001;
+float p_roll=5, p_pitch=5, p_throttle=5;
+// hover values of roll pitch and throttle
+unsigned short int hov_roll=1500, hov_pitch=1500, hov_throttle=1400, throttle_max=1900, throttle_min=900;
 
 // definition of callback functions. Note that here callback functions
 // just read some values and save them to variables. so let's go ....
@@ -51,11 +53,54 @@ int main(int argc, char **argv)
     {
 
         auto_msgs::auto_com command;
+	/*
         // The simple P controller, this is the very first step and may it don't work good.
         // I will ok it in the test and further study and thinking...
-        roll = p_roll * (x_r - x_c);
-        pitch = p_pitch * (z_r - z_c);
-        throttle = p_throttle * (y_r - y_c);
+        roll = p_roll * (x_r - x_c) + 1300;
+        pitch = p_pitch * (z_r - z_c) + 1300;
+        throttle = p_throttle * (y_r - y_c) + 1100;
+	*/
+
+	// now let's correct the auto commands for real quadrotor and test
+	//roll
+	roll = p_roll * (x_r - x_c);
+	if (roll > 500){
+		roll = 500;
+	}
+	else if (roll < -500){
+		roll = -500;
+	}
+	else{
+		// do nothing
+	}
+	//roll value to send mid-ware board
+	roll = hov_roll + roll;
+	//pitch
+	pitch = p_pitch * (z_r - z_c);
+	if (pitch > 500){
+		pitch = 500;
+	}
+	else if (pitch < -500){
+		pitch = -500;
+	}
+	else{
+		//do nothing
+	}
+	//pitch value to send mid-ware board
+	pitch = hov_pitch + pitch;
+	//throttle
+	throttle = p_throttle * (y_r - y_c);
+	if (throttle > (throttle_max - hov_throttle)){
+		throttle = throttle_max - hov_throttle;
+	}
+	else if (throttle < (throttle_min - hov_throttle)){
+		throttle = throttle_min - hov_throttle;
+	}
+	else{
+		// do nothing
+	}
+	// throttle value to send mid-ware board
+	throttle = hov_throttle + throttle;
 
         // now assign these values to the message content to publish the message.
         //command.auto_com = {roll, pitch, throttle};
