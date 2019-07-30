@@ -10,9 +10,9 @@
 unsigned short int roll, pitch, throttle;
 double x_r, y_r, z_r, x_c, y_c, z_c;
 // p controller coefficients
-float p_roll=5, p_pitch=5, p_throttle=5;
+float p_roll=20, p_pitch=20, p_throttle=10;
 // hover values of roll pitch and throttle
-unsigned short int hov_roll=1500, hov_pitch=1500, hov_throttle=1400, throttle_max=1900, throttle_min=900;
+unsigned short int hov_roll=1503, hov_pitch=1503, hov_throttle=1569, throttle_max=1580, throttle_min=1560;
 
 // definition of callback functions. Note that here callback functions
 // just read some values and save them to variables. so let's go ....
@@ -64,11 +64,11 @@ int main(int argc, char **argv)
 	// now let's correct the auto commands for real quadrotor and test
 	//roll
 	roll = p_roll * (x_r - x_c);
-	if (roll > 500){
-		roll = 500;
+	if (roll > 10){
+		roll = 10;
 	}
-	else if (roll < -500){
-		roll = -500;
+	else if (roll < -10){
+		roll = -10;
 	}
 	else{
 		// do nothing
@@ -77,11 +77,11 @@ int main(int argc, char **argv)
 	roll = hov_roll + roll;
 	//pitch
 	pitch = p_pitch * (z_r - z_c);
-	if (pitch > 500){
-		pitch = 500;
+	if (pitch > 10){
+		pitch = 10;
 	}
-	else if (pitch < -500){
-		pitch = -500;
+	else if (pitch < -10){
+		pitch = -10;
 	}
 	else{
 		//do nothing
