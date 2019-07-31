@@ -6,6 +6,11 @@
 #include <auto_msgs/auto_com.h>
 #include <geometry_msgs/PoseStamped.h>
 
+// define global variables for detecting which the marker is lost
+ros::Time ref_time, current_time;
+// setting the loss time duration threshold to 0.3 second
+ros::Duration loss_time, loss_thresh_time(0, 300000000);
+
 // let's define our variables to not forgot. later you can move them another places.
 unsigned short int roll, pitch, throttle;
 double x_r, y_r, z_r, x_c, y_c, z_c;
@@ -27,6 +32,9 @@ void refCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 // poseCallback
 void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
+    //update the time which last position data recieved
+    ref_time = ros::Time::now();
+    // reading the data
     x_c = msg->pose.position.x;
     y_c = msg->pose.position.y;
     z_c = msg->pose.position.z;
@@ -60,48 +68,60 @@ int main(int argc, char **argv)
         pitch = p_pitch * (z_r - z_c) + 1300;
         throttle = p_throttle * (y_r - y_c) + 1100;
 	*/
-
-	// now let's correct the auto commands for real quadrotor and test
-	//roll
-	roll = p_roll * (x_r - x_c);
-	if (roll > 10){
-		roll = 10;
+	//see if the data is lost or not
+	current_time = ros::Time::now();
+	loss_time = current_time - ref_time;
+	if(loss_time < loss_thresh_time)
+	{
+		// now let's correct the auto commands for real quadrotor and test
+		//roll
+		roll = p_roll * (x_r - x_c);
+		if (roll > 10){
+			roll = 10;
+		}
+		else if (roll < -10){
+			roll = -10;
+		}
+		else{
+			// do nothing
+		}
+		//roll value to send mid-ware board
+		roll = hov_roll + roll;
+		//pitch
+		pitch = p_pitch * (z_r - z_c);
+		if (pitch > 10){
+			pitch = 10;
+		}
+		else if (pitch < -10){
+			pitch = -10;
+		}
+		else{
+			//do nothing
+		}
+		//pitch value to send mid-ware board
+		pitch = hov_pitch + pitch;
+		//throttle
+		throttle = p_throttle * (y_r - y_c);
+		if (throttle > (throttle_max - hov_throttle)){
+			throttle = throttle_max - hov_throttle;
+		}
+		else if (throttle < (throttle_min - hov_throttle)){
+			throttle = throttle_min - hov_throttle;
+		}
+		else{
+			// do nothing
+		}
+		// throttle value to send mid-ware board
+		throttle = hov_throttle + throttle;
 	}
-	else if (roll < -10){
-		roll = -10;
+	else
+	{
+		// this is for when the marker is lost and we must quadrotor stop at the point
+		roll = hov_roll;
+		pitch = hov_pitch;
+		throttle = hov_throttle;
 	}
-	else{
-		// do nothing
-	}
-	//roll value to send mid-ware board
-	roll = hov_roll + roll;
-	//pitch
-	pitch = p_pitch * (z_r - z_c);
-	if (pitch > 10){
-		pitch = 10;
-	}
-	else if (pitch < -10){
-		pitch = -10;
-	}
-	else{
-		//do nothing
-	}
-	//pitch value to send mid-ware board
-	pitch = hov_pitch + pitch;
-	//throttle
-	throttle = p_throttle * (y_r - y_c);
-	if (throttle > (throttle_max - hov_throttle)){
-		throttle = throttle_max - hov_throttle;
-	}
-	else if (throttle < (throttle_min - hov_throttle)){
-		throttle = throttle_min - hov_throttle;
-	}
-	else{
-		// do nothing
-	}
-	// throttle value to send mid-ware board
-	throttle = hov_throttle + throttle;
-
+	
         // now assign these values to the message content to publish the message.
         //command.auto_com = {roll, pitch, throttle};
 	command.auto_com.x = roll;
@@ -109,6 +129,8 @@ int main(int argc, char **argv)
 	command.auto_com.z = throttle;
         //publish the message
         auto_com_pub.publish(command);
+        //we use spinOnce because we are in while loop and every spinOnce wait just for one coming
+        //messages.
         ros::spinOnce(); // this is actually subscribing the refrence and currect positions via callback functions
         loop_rate.sleep();
 
