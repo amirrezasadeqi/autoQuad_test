@@ -198,3 +198,6 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+# adding the executable of opticalflow data manipulator node
+add_executable(optflow_dataman src/opt_flow_node.cpp)
+target_link_libraries(optflow_dataman ${catkin_LIBRARIES})
