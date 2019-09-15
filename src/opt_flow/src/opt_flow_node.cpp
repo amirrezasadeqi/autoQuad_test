@@ -78,8 +78,8 @@ int main(int argc, char **argv)
                 x_vel.push_back(list.flow_message[i].velocity.x);
                 y_vel.push_back(list.flow_message[i].velocity.y);
             }
-            vel_message.x = accumulate(begin(x_vel), end(x_vel), 0.0) / x_vel.size();
-            vel_message.y = accumulate(begin(y_vel), end(y_vel), 0.0) / y_vel.size();
+            vel_message.x = accumulate(x_vel.begin(), x_vel.end(), 0.0) / x_vel.size();
+            vel_message.y = accumulate(y_vel.begin(), y_vel.end(), 0.0) / y_vel.size();
             vel_pub.publish(vel_message);
                 
         }
