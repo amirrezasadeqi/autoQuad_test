@@ -17,5 +17,7 @@
    <node pkg="guid" type="nav_node" name="auto_guider" />
    <!-- launching the i2c_node for sending the auto commands to mid-ware board -->
    <node pkg="i2c_gate" type="i2c_node.py" name="i2c_bus" />
+   <!-- launching the ultrasonic_sens_node.py for publishing the ultrasonic sensor data to the ros network -->
+   <node pkg="ultrasonic_sens" type="ultrasonic_sens_node.py" name="ultrasonic_sens_node" />
 
 </launch>
