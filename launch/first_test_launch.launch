@@ -3,9 +3,19 @@
   <!-- including the r200 launch file for getting 
   the video from r200 camera -->
   <include file="$(find realsense_camera)/launch/r200_nodelet_default.launch" />
+  <!-- we need to run the usb_cam_node because the front camera needs this for giving the image to the 
+       aruco markerfinder. -->
+   <node pkg="usb_cam" type="usb_cam_node" name="usb_cam" output="screen">
+     <param name="video_device" value="/dev/video3" />
+     <param name="image_width" value="640" />
+     <param name="image_height" value="480" />
+     <param name="pixel_format" value="yuyv" />
+     <param name="camera_frame_id" value="usb_cam" />
+     <param name="io_method" value="mmap"/>
+   </node>
    <!-- including the aruco marker finder for 
    detecting single marker -->
-   <include file="$(find marker_finder)/launch/aruco_marker_finder_r200.launch" />
+   <include file="$(find marker_finder)/launch/aruco_marker_finder_usb_cam.launch" />
    <!-- including the launch file for lucas kanade opticalflow -->
    <include file="$(find opencv_apps)/launch/lk_flow.launch">
         <arg name="image" default="/camera/color/image_raw" />
