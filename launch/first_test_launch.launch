@@ -11,8 +11,13 @@
         <arg name="image" default="/camera/color/image_raw" />
    </include>
    <!-- the custom node that reads the opticalflow data and publishes the mean velocity of x and y
-        directions -->
-   <node pkg="opt_flow" type="optflow_dataman" name="optflow_dataman" />
+        directions. for low speed of processor i changed this to a launch file and run it with the
+        timed_roslaunch package with a delay of one seconde. -->
+   <include file="$(find timed_roslaunch)/launch/timed_roslaunch.launch">
+        <arg name="time" value="1"/>
+        <arg name="pkg" value="opt_flow"/>
+        <arg name="file" value="optflow.launch"/>
+   </include>  
    <!-- launching the navigation node for autonomous guidance -->
    <node pkg="guid" type="nav_node" name="auto_guider" />
    <!-- launching the i2c_node for sending the auto commands to mid-ware board -->
