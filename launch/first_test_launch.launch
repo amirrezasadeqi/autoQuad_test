@@ -19,6 +19,9 @@
    <!-- including the launch file for lucas kanade opticalflow -->
    <include file="$(find opencv_apps)/launch/lk_flow.launch">
         <arg name="image" default="/camera/color/image_raw" />
+        <arg name="use_camera_info" default="/camera/color/camera_info"/>
+        <arg name="debug_view" default="false"/>
+        <arg name="min_distance" default="20"/>
    </include>
    <!-- the custom node that reads the opticalflow data and publishes the mean velocity of x and y
         directions. for low speed of processor i changed this to a launch file and run it with the
